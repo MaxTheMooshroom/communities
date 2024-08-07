@@ -1,10 +1,21 @@
 
-description="Install all of the necessary prequisites for running the provided modpack in a server"
+description="Install all of the necessary prequisites for running the provided modpack in a server."
 
-MRPACK="./communities-0.2.1.mrpack"
-add_flag '-' "mrpack" "the mrpack to use for the server construction" 1 "mrpack" "string"
+declare -g CONSOLE_NC='\033[0m'
+declare -g CONSOLE_RED='\033[0;31m'
+declare -g CONSOLE_PINK='\033[1;35m'
+declare -g CONSOLE_GREEN='\033[1;32m'
+
+declare -g MRPACK="./communities-0.2.1.mrpack"
+add_flag '-' "mrpack" "The mrpack to use for the server construction." 1 "mrpack" "string"
 function flag_name_mrpack {
     MRPACK="$1"
+}
+
+declare -g VERBOSE=0
+add_flag 'v' "verbose" "Enable verbose output." 1
+function flag_name_verbose {
+    VERBOSE=1
 }
 
 # fetch the forge server jar
@@ -49,7 +60,9 @@ function validate_file {
     [[ -z ${mod_info} ]] && error "Got no response for the modrinth project id '${project_id}'" 255
     if [[ "$(echo ${mod_info} | jq -r '.server_side')" == "unsupported" ]]; then
         local mod_name=$(echo ${mod_info} | jq -r '.title')
-        echo -e "\tNot supported server-side, skipping... ('${version_id}':'${mod_name}')" >&2
+        if [[ ${VERBOSE} -eq 1 ]]; then
+            echo -e "\t${CONSOLE_RED}Not supported server-side, skipping...${CONSOLE_NC} ('${version_id}':'${mod_name}')" >&2
+        fi
         return 1
     fi
     return 0
@@ -73,18 +86,21 @@ function fetch_mrpack {
             local live_hash="$(sha512sum "${filepath}" | awk '{ print $1 }')"
 
             if [[ "${live_hash}" == "${filehash}" ]]; then
-                echo -e "\tFile found locally, skipping" >&2
-                echo -e "\t    -> '${filepath##./data-dir/}'"
+                if [[ ${VERBOSE} -eq 1 ]]; then
+                    echo -e "\t${CONSOLE_GREEN}File found locally, skipping...${CONSOLE_NC}" >&2
+                    echo -e "\t    -> '${filepath##./data-dir/}'"
+                fi
                 continue
             else
-                echo -e "\tFile found locally, hash mismatch! Replacing..." >&2
+                [[ ${VERBOSE} -eq 1 ]] && echo -e "\tFile found locally, hash mismatch! Removing..." >&2
                 rm "${filepath}"
             fi
         fi
 
         if validate_file ${fileurl}; then
+            [[ ${VERBOSE} -eq 1 ]] && echo -e "\t${CONSOLE_PINK}Fetching '${filepath##./data-dir/}'...${CONSOLE_NC}"
             fetch_file ${fileurl} ${filepath} ${filehash} &
-            $(( fetch_count++ ))
+            (( fetch_count++ ))
         fi
     done
     wait
@@ -96,6 +112,7 @@ function fetch_mrpack {
 function target_install {
     mkdir -p ./data-dir/
     mkdir -p ./logs/
+    [[ -d /dev/shm/mrpack ]] && rm -rf /dev/shm/mrpack
     mkdir -p /dev/shm/mrpack
     unzip -q ${MRPACK} -d /dev/shm/mrpack
     chown -R $(whoami) /dev/shm/mrpack
