@@ -5,39 +5,39 @@ if [ -z "${BASH}" ]; then
     exit 255
 fi
 
-declare -g DHELPER_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-declare -g DHELPER_NAME="${0##${DHELPER_PATH}/}"
+declare -g APP_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+declare -g APP_NAME="${0##${APP_PATH}/}"
 declare -g PROJECT_PATH="$(pwd)"
 
-[[ "${DHELPER_PATH}" == "${PROJECT_PATH}" && "$1" == "-g" ]] && shift
+[[ "${APP_PATH}" == "${PROJECT_PATH}" && "$1" == "-g" ]] && shift
 
-if [[ "${DHELPER_PATH}" != "${PROJECT_PATH}" && ! -f "${PROJECT_PATH}/${DHELPER_NAME}" ]]; then
-    PROJECT_PATH="${DHELPER_PATH}"
+if [[ "${APP_PATH}" != "${PROJECT_PATH}" && ! -f "${PROJECT_PATH}/${APP_NAME}" ]]; then
+    PROJECT_PATH="${APP_PATH}"
 fi
 
-if [[ "${DHELPER_PATH}" != "${PROJECT_PATH}" && "$1" == "-g" ]]; then
-    echo "Using external dhelper..."
+if [[ "${APP_PATH}" != "${PROJECT_PATH}" && "$1" == "-g" ]]; then
+    echo "Using external ${APP_NAME}..."
     shift
-    PROJECT_PATH="${DHELPER_PATH}"
-elif [[ "${DHELPER_PATH}" != "${PROJECT_PATH}" && -f "${PROJECT_PATH}/${DHELPER_NAME}" ]]; then
-    echo "Using local dhelper..."
-    ${PROJECT_PATH}/${DHELPER_NAME} $@
+    PROJECT_PATH="${APP_PATH}"
+elif [[ "${APP_PATH}" != "${PROJECT_PATH}" && -f "${PROJECT_PATH}/${APP_NAME}" ]]; then
+    echo "Using local ${APP_NAME}..."
+    ${PROJECT_PATH}/${APP_NAME} $@
     exit $?
 fi
 
-if [[ ! -d "${DHELPER_PATH}/.goose" || ! -f "${DHELPER_PATH}/.goose/arg_parse.bash" ]]; then
+if [[ ! -d "${APP_PATH}/.goose" || ! -f "${APP_PATH}/.goose/arg_parse.bash" ]]; then
     echo "${PROJECT_PATH}/.goose/arg_parse.bash is missing! Critical dependency! Exiting..." >&2
     exit 255
 fi
-source ${DHELPER_PATH}/.goose/arg_parse.bash
+source ${APP_PATH}/.goose/arg_parse.bash
 
-# if [[ ! -f "${DHELPER_PATH}/.goose/dag.bash" ]]; then
-#     error "${DHELPER_PATH}/.goose/dag.bash is missing! Critical dependency! Exiting..." 255
+# if [[ ! -f "${APP_PATH}/.goose/dag.bash" ]]; then
+#     error "${APP_PATH}/.goose/dag.bash is missing! Critical dependency! Exiting..." 255
 # fi
 # source .goose/dag.bash
 
-# if [[ ! -f "${DHELPER_PATH}/.goose/test.bash" ]]; then
-#     error "${DHELPER_PATH}.goose/test.bash is missing! Critical dependency! Exiting..." 255
+# if [[ ! -f "${APP_PATH}/.goose/test.bash" ]]; then
+#     error "${APP_PATH}.goose/test.bash is missing! Critical dependency! Exiting..." 255
 # fi
 # source $(.goose/test.bash
 

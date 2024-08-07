@@ -1,5 +1,5 @@
 {
-  description = "dhelper template virtual environment";
+  description = "'communities' modpack container (with utils)";
 
   inputs.devshell.url = "github:numtide/devshell";
   inputs.flake-parts.url = "github:hercules-ci/flake-parts";
@@ -30,30 +30,22 @@
         devshells.default = {
 
           packages = with pkgs; [
-            graphviz
-            shellcheck
+            jq
+            jdk17
+            rcon
+            docker
+            lazydocker
           ];
 
           commands = [
-            # {
-            #   category = "tools";
-            #   # package = pkgs.libcamera;
-            #   name = "cam";
-            #   command = "${pkgs.libcamera}/bin/cam -l $@";
-            # }
           ];
         
           env = [
-            # { name = "PATH";          prefix  = ""; }
-            # { name = "INCLUDE_PATH";  eval    = "$C_INCLUDE_PATH"; }
           ];
         };
 
         packages = let
-          # cross = pkgs;
-          # .pkgsCross.riscv64;
         in {
-          # ...
         };
       };
     };

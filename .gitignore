@@ -1,7 +1,5 @@
 
 .direnv/
-.check.txt
-.env
-targets/*.bash
-!targets/common.bash
-extras/*
+data-dir/
+logs/
+installers/

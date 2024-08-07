@@ -1,0 +1,61 @@
+services:
+  minecraft-server:
+    image: communities:latest
+    build: .
+    ports:
+      - 25565:25565
+      - 25575:25575
+      - 3876:3876
+      - 24454:24454
+    volumes:
+      - type: bind
+        source: ./data-dir
+        target: /communities
+
+    ## limits for using `docker compose up`
+    mem_limit: 12G
+    mem_reservation: 8G
+    cpus: '2.0'
+    # one big core (4,16), one little core (11,12)
+    cpuset: '1,2'
+
+    # specific to deployments
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 9G
+        reservations:
+          cpus: '2.0'
+          memory: 6G
+
+  minecraft-http:
+    image: communities-http:latest
+    build: ./http
+    ports:
+      - 8080:8080    # http server port
+      - 25565:25565  # minecraft server port
+      - 25575:25575  # rcon port
+      - 3876:3876    # create track map port
+    volumes:
+      - type: bind
+        source: ./http
+        target: /http
+
+    ## limits for using `docker compose up`
+    mem_limit: 100M
+    mem_reservation: 100M
+    cpus: '1.0'
+    cpuset: '1'
+
+    # specific to deployments
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 100M
+        reservations:
+          cpus: '0.1'
+          memory: 100M
+
+#volumes:
