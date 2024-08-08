@@ -28,34 +28,3 @@ services:
         reservations:
           cpus: '2.0'
           memory: 6G
-
-  minecraft-http:
-    image: communities-http:latest
-    build: ./http
-    ports:
-      - 8080:8080    # http server port
-      - 25565:25565  # minecraft server port
-      - 25575:25575  # rcon port
-      - 3876:3876    # create track map port
-    volumes:
-      - type: bind
-        source: ./http
-        target: /http
-
-    ## limits for using `docker compose up`
-    mem_limit: 100M
-    mem_reservation: 100M
-    cpus: '1.0'
-    cpuset: '1'
-
-    # specific to deployments
-    deploy:
-      resources:
-        limits:
-          cpus: '0.1'
-          memory: 100M
-        reservations:
-          cpus: '0.1'
-          memory: 100M
-
-#volumes:

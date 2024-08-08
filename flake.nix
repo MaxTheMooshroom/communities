@@ -30,10 +30,12 @@
         devshells.default = {
 
           packages = with pkgs; [
-            jq
             jdk17
-            rcon
             docker
+            sshuttle
+
+            jq
+            rcon
             lazydocker
           ];
 

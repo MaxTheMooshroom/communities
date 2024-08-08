@@ -456,7 +456,7 @@ function print_help {
     # print help for targets
     if [[ $# -gt 0 ]]; then
         if [[ ! -f "${PROJECT_PATH}/targets/${flag_help}.bash" ]] && ! is_builtin "${flag_help}"; then
-            error "No such command '${flag_help}'" 255
+            error "No such target '${flag_help}'" 255
 
         elif is_builtin "${flag_help}"; then
             local current_target="${flag_help}"
